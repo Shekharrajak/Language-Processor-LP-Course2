@@ -1,0 +1,33 @@
+lex TAC.l
+yacc TAC.y
+gcc main.c -ll
+
+
+/******  OUTPUT  **********/
+
+[a38@localhost ~]$ ./a.out
+1+2*5-6/4
+
+a = 2 * 5
+
+b = 1 + a
+
+c = 6 / 4
+
+d = b - c
+
+t = d
+
+
+[a38@localhost ~]$ ./a.out
+1+2*(3+4)/5
+
+a = 3 + 4
+
+b = 2 * a
+
+c = b / 5
+
+d = 1 + c
+
+t = d

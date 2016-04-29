@@ -1,0 +1,343 @@
+>>>TESTCASES.txt<<<
+
+>>>The following test cases were checked on the program and satisfactory results were achieved. The output produced by a test case is appended to it.<<<
+
+1. Declarations, Assignments, Arithmetic Expressions, Boolean Expressions and Bitwise Expressions.
+
+INPUT:
+{
+	int   a, b, c;
+	u_int d, e, f;
+	bool  g, h, i;
+	
+	a += (a * b - c * 2 @ 3);
+	b *= b;
+	c = a * b / 2;
+	d = a + b - c;
+	e = e / 10;
+	f = a + b - c * d / e;
+	a = a ^ b;
+	b = ~ b;
+	c = a | b;
+	d = c & d;
+
+	g = true;
+	h = false;
+	i = ! h;
+	g = g && i || h;
+}
+
+OUTPUT:
+INTERMEDIATE CODE:
+t0 = a * b
+t1 = 2 @ 3
+t2 = c * t1
+t3 = t0 - t2
+t4 = a + t3
+a = t4
+t5 = b * b
+b = t5
+t6 = a * b
+t7 = t6 / 2
+c = t7
+t8 = a + b
+t9 = t8 - c
+d = t9
+t10 = e / 10
+e = t10
+t11 = a + b
+t12 = c * d
+t13 = t12 / e
+t14 = t11 - t13
+f = t14
+t15 = a ^ b
+a = t15
+t16 = ~ b
+b = t16
+t17 = a | b
+c = t17
+t18 = c & d
+d = t18
+g = 1
+h = 0
+t19 = ! h
+i = t19
+if g isTrue goto L0                                                                        /* to_start_of_second_term */
+|   t20 = false
+goto L1                                                                                       /* to_end_of_expression */
+L0:                                                                                           /* start_of_second_term */
+|   t20 = i
+L1:                                                                                              /* end_of_expression */
+if t20 isFalse goto L2                                                                     /* to_start_of_second_term */
+|   t21 = true
+goto L3                                                                                       /* to_end_of_expression */
+L2:                                                                                           /* start_of_second_term */
+|   t21 = h
+L3:                                                                                              /* end_of_expression */
+g = t21
+
+//////////////////////////////////////
+2. Simple While Loop.
+
+INPUT:
+{
+	int a,b;
+	a = 10;
+	b = 10;
+	while(a <= 50 && b <= 64)
+	{
+		a += 10;
+		b *= 2;
+	}
+}
+
+OUTPUT:
+INTERMEDIATE CODE:
+a = 10
+b = 10
+L0:                                                                                                  /* start_of_loop */
+t0 = a <= 50
+if t0 isTrue goto L2                                                                       /* to_start_of_second_term */
+|   t1 = false
+goto L3                                                                                       /* to_end_of_expression */
+L2:                                                                                           /* start_of_second_term */
+|   t2 = b <= 64
+|   t1 = t2
+L3:                                                                                              /* end_of_expression */
+if t1 isFalse goto L1                                                                               /* to_end_of_loop */
+|   t3 = a + 10
+|   a = t3
+|   t4 = b * 2
+|   b = t4
+goto L0                                                                                           /* to_start_of_loop */
+L1:                                                                                                    /* end_of_loop */
+
+
+//////////////////////////////////////
+3. Simple If-Else Conditional.
+
+INPUT:
+{
+	int myFavoriteColor, colorVal;
+	colorVal = 2 * 5 @ 2 + 1;
+	if(colorVal / 2 * 2 == colorVal)
+		if(colorVal > 2)
+			myFavoriteColor = 1;
+		else
+			myFavoriteColor = 2;
+	else
+			myFavoriteColor = 3;
+}
+
+OUTPUT:
+INTERMEDIATE CODE:
+t0 = 5 @ 2
+t1 = 2 * t0
+t2 = t1 + 1
+colorVal = t2
+t3 = colorVal / 2
+t4 = t3 * 2
+t5 = t4 == colorVal
+if t5 isFalse goto L0                                                                             /* to_start_of_else */
+|   t6 = colorVal > 2
+|   if t6 isFalse goto L2                                                                         /* to_start_of_else */
+|   |   myFavoriteColor = 1
+|   goto L3                                                                                           /* to_end_of_if */
+|   L2:                                                                                              /* start_of_else */
+|   |   myFavoriteColor = 2
+|   L3:                                                                                                  /* end_of_if */
+goto L1                                                                                               /* to_end_of_if */
+L0:                                                                                                  /* start_of_else */
+|   myFavoriteColor = 3
+L1:                                                                                                      /* end_of_if */
+
+//////////////////////////////////////
+4. Simple Switch Case.
+
+INPUT:
+{
+	int num, a, b;
+	num = 2 * a - 10 * 2;
+	switch(num)
+	{
+		case 1 : b = 1;
+				 break;
+		case 2 : b = 2;
+		case 3 : b = 3;
+		case 4 : b = 4;
+				 break;
+		case 5 : b = 5;
+		default: b = 10;
+	}
+}
+
+OUTPUT:
+INTERMEDIATE CODE:
+t0 = 2 * a
+t1 = 10 * 2
+t2 = t0 - t1
+num = t2
+t3 = num == 1
+if t3 isFalse goto L2                                                                               /* to_end_of_case */
+L1:                                                                                                   /* fall_through */
+|   b = 1
+goto L0                                                                                             /* to_switch_exit */
+goto L3                                                                                          /* goto_fall_through */
+L2:                                                                                                    /* end_of_case */
+t4 = num == 2
+if t4 isFalse goto L4                                                                               /* to_end_of_case */
+L3:                                                                                                   /* fall_through */
+|   b = 2
+goto L5                                                                                          /* goto_fall_through */
+L4:                                                                                                    /* end_of_case */
+t5 = num == 3
+if t5 isFalse goto L6                                                                               /* to_end_of_case */
+L5:                                                                                                   /* fall_through */
+|   b = 3
+goto L7                                                                                          /* goto_fall_through */
+L6:                                                                                                    /* end_of_case */
+t6 = num == 4
+if t6 isFalse goto L8                                                                               /* to_end_of_case */
+L7:                                                                                                   /* fall_through */
+|   b = 4
+goto L0                                                                                             /* to_switch_exit */
+goto L9                                                                                          /* goto_fall_through */
+L8:                                                                                                    /* end_of_case */
+t7 = num == 5
+if t7 isFalse goto L10                                                                              /* to_end_of_case */
+L9:                                                                                                   /* fall_through */
+|   b = 5
+goto L11                                                                                         /* goto_fall_through */
+L10:                                                                                                   /* end_of_case */
+L11:                                                                                                  /* fall_through */
+|   b = 10
+L0:                                                                                                    /* switch_exit */
+
+//////////////////////////////////////
+5. A Complex Statement
+
+INPUT:
+{
+	int num, a, b, myFavoriteColor, colorVal;
+
+	switch(num)
+	{
+		case 1:		while(a <= 50 && b <= 64)
+					{
+						a += 10;
+						b *= 2;
+					}
+					break;
+		case 2:		colorVal = 2 * 5 @ 2 + 1;
+					if(colorVal / 2 * 2 == colorVal)
+						if(colorVal > 2)
+							myFavoriteColor = 1;
+						else
+							myFavoriteColor = 2;
+					else
+							myFavoriteColor = 3;
+					break;
+		default:	switch(num)
+					{
+						case 1 : b = 1;
+								 break;
+						case 2 : b = 2;
+						case 3 : b = 3;
+						case 4 : b = 4;
+								 break;
+						case 5 : b = 5;
+						default: b = 10;
+					}
+	}
+}
+
+OUTPUT:
+INTERMEDIATE CODE:
+t0 = num == 1
+if t0 isFalse goto L2                                                                               /* to_end_of_case */
+L1:                                                                                                   /* fall_through */
+|   L4:                                                                                              /* start_of_loop */
+|   t1 = a <= 50
+|   if t1 isTrue goto L6                                                                   /* to_start_of_second_term */
+|   |   t2 = false
+|   goto L7                                                                                   /* to_end_of_expression */
+|   L6:                                                                                       /* start_of_second_term */
+|   |   t3 = b <= 64
+|   |   t2 = t3
+|   L7:                                                                                          /* end_of_expression */
+|   if t2 isFalse goto L5                                                                           /* to_end_of_loop */
+|   |   t4 = a + 10
+|   |   a = t4
+|   |   t5 = b * 2
+|   |   b = t5
+|   goto L4                                                                                       /* to_start_of_loop */
+|   L5:                                                                                                /* end_of_loop */
+goto L0                                                                                             /* to_switch_exit */
+goto L3                                                                                          /* goto_fall_through */
+L2:                                                                                                    /* end_of_case */
+t6 = t2 == 2
+if t6 isFalse goto L8                                                                               /* to_end_of_case */
+L3:                                                                                                   /* fall_through */
+|   t7 = 5 @ 2
+|   t8 = 2 * t7
+|   t9 = t8 + 1
+|   colorVal = t9
+|   t10 = colorVal / 2
+|   t11 = t10 * 2
+|   t12 = t11 == colorVal
+|   if t12 isFalse goto L10                                                                       /* to_start_of_else */
+|   |   t13 = colorVal > 2
+|   |   if t13 isFalse goto L12                                                                   /* to_start_of_else */
+|   |   |   myFavoriteColor = 1
+|   |   goto L13                                                                                      /* to_end_of_if */
+|   |   L12:                                                                                         /* start_of_else */
+|   |   |   myFavoriteColor = 2
+|   |   L13:                                                                                             /* end_of_if */
+|   goto L11                                                                                          /* to_end_of_if */
+|   L10:                                                                                             /* start_of_else */
+|   |   myFavoriteColor = 3
+|   L11:                                                                                                 /* end_of_if */
+goto L0                                                                                             /* to_switch_exit */
+goto L9                                                                                          /* goto_fall_through */
+L8:                                                                                                    /* end_of_case */
+L9:                                                                                                   /* fall_through */
+|   t14 = num == 1
+|   if t14 isFalse goto L16                                                                         /* to_end_of_case */
+|   L15:                                                                                              /* fall_through */
+|   |   b = 1
+|   goto L14                                                                                        /* to_switch_exit */
+|   goto L17                                                                                     /* goto_fall_through */
+|   L16:                                                                                               /* end_of_case */
+|   t15 = num == 2
+|   if t15 isFalse goto L18                                                                         /* to_end_of_case */
+|   L17:                                                                                              /* fall_through */
+|   |   b = 2
+|   goto L19                                                                                     /* goto_fall_through */
+|   L18:                                                                                               /* end_of_case */
+|   t16 = num == 3
+|   if t16 isFalse goto L20                                                                         /* to_end_of_case */
+|   L19:                                                                                              /* fall_through */
+|   |   b = 3
+|   goto L21                                                                                     /* goto_fall_through */
+|   L20:                                                                                               /* end_of_case */
+|   t17 = num == 4
+|   if t17 isFalse goto L22                                                                         /* to_end_of_case */
+|   L21:                                                                                              /* fall_through */
+|   |   b = 4
+|   goto L14                                                                                        /* to_switch_exit */
+|   goto L23                                                                                     /* goto_fall_through */
+|   L22:                                                                                               /* end_of_case */
+|   t18 = num == 5
+|   if t18 isFalse goto L24                                                                         /* to_end_of_case */
+|   L23:                                                                                              /* fall_through */
+|   |   b = 5
+|   goto L25                                                                                     /* goto_fall_through */
+|   L24:                                                                                               /* end_of_case */
+|   L25:                                                                                              /* fall_through */
+|   |   b = 10
+|   L14:                                                                                               /* switch_exit */
+L0:                                                                                                    /* switch_exit */
+
+//////////////////////////////////////
+
+Other complicated test cases can be generated by combining any of the above statements.

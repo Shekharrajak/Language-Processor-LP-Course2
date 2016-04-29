@@ -1,0 +1,25 @@
+%{
+/*Program for lex analysis */
+#include<stdio.h>
+#include<stdlib.h>
+int del_count=0,oper_count=0,key_count=0;
+%}
+
+letter[a-z][A-Z0-9a-z0-9]*
+digit[0-9]+
+
+%%
+int|float|string|cout|cin|void|main|include|stdio.h     key_count++;printf("%s : is a keyword\nNumber of keywords : %d\n",yytext,key_count);
+{letter}        printf("%s : is a identifier.\n",yytext);
+{digit}         printf("%s : is a number.\n",yytext);
+[=|+|-|*|%|<|>] printf("%s : is a operator,\nNumber of operator: %d\n",yytext,oper_count);oper_count++;
+[(|)|{|}|;]     printf("%s : is a delemeter.\nNumber of delmeter : %d\n",yytext,del_count);del_count++;
+.\n|# ;
+%%
+
+
+int main(int argc,char* argv[]){
+        yylex();
+return 0;
+
+}

@@ -1,0 +1,1453 @@
+C & C++
+JAVA
+WEB PROGRAMMING
+LEX-YACC
+PROJECTS & SEMINARS
+PLACEMENT
+TwitterFacebookGoogle PlusLinkedInRSS FeedEmail
+●.. My B.Tech ..● 2K8618.blogspot.com  - 2K8CSE
+
+HOME
+SEMESTER 1-2 »
+SEMESTER 3 »
+SEMESTER 4 »
+SEMESTER 5 »
+SEMESTER 6 »
+SEMESTER 7 »
+SEMESTER 8 »
+Showing posts with label Compiler Design. Show all posts
+FLOATING POINT & INTEGERS LEX PROGRAM COMPILER DESIGN
+Program:
+
+
+// frn.l
+
+
+%{
+
+%}
+
+DIGIT    [0-9]
+
+%%
+
+{DIGIT}*        {ECHO;printf(" Integer");}
+{DIGIT}*?\.{DIGIT}*    {ECHO;printf(" Float ");}
+
+%%
+main()
+{
+    yylex();
+}
+
+
+Output:
+
+
+nn@linuxmint ~ $ lex frn.l
+nn@linuxmint ~ $ gcc lex.yy.c -ll
+nn@linuxmint ~ $ ./a.out<test1.txt
+1 Integer
+500 Integer
+10.1 Float 
+.1 Float 
+1.0 Float 
+
+nn@linuxmint ~ $
+
+// input : test1.txt
+
+1
+500
+10.1
+.1
+1.0
+0 comments 
+Labels: Compiler Design, Compiler Lab, Floating Point and Integers, LEX, Semester 6
+You might also like:
+Number Each Line - Lex Program - Compiler Design
+Select Lines Starting with 'm' - Lex Program - Compiler Design
+Replace Sequences of White Spaces by a Single Blank Character - Lex Program - Compiler Design
+Count The Number of Lines,Words and Characters - Lex Program - Compiler Design
+Linkwithin
+PARSER FOR SQL NESTED QUERIES - COMPILER DESIGN - YACC PROGRAM
+Program:
+
+// Lex file: sq.l
+alpha [A-Za-z]
+digit [0-9]
+%%
+
+[ \t\n]
+select        return SELECT;
+distinct     return DISTINCT;
+from         return FROM;
+where       return WHERE;
+like           return LIKE;
+desc         return DESC;
+asc           return ASC;
+"group by"    return GROUP;
+having           return HAVING;
+"order by"     return ORDER;
+or                  return OR;
+and                return AND;
+in                   return IN;
+{digit}+        return NUM;
+{alpha}({alpha}|{digit})* return ID;
+"<="              return LE;
+">="              return GE;
+"=="              return EQ;
+"!="               return NE;
+.                     return yytext[0];
+%%
+
+// Yacc file: sq.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+%}
+%token ID NUM SELECT DISTINCT FROM WHERE LE GE EQ NE OR AND LIKE GROUP HAVING ORDER ASC DESC IN
+%right '='
+%left AND OR
+%left '<' '>' LE GE EQ NE
+
+%%
+
+    S    : ST1';' {printf("INPUT ACCEPTED...\n");exit(0);};
+    ST1    : SELECT attributeList FROM tableList ST2
+        | SELECT DISTINCT attributeList FROM tableList ST2
+        ;
+    ST2    : WHERE COND ST3
+        | ST3
+        ;
+    ST3    : GROUP attributeList ST4
+        | ST4
+        ;
+    ST4    : HAVING COND ST5
+        | ST5
+        ;
+    ST5    : ORDER attributeList ST6
+        |
+        ;
+    ST6    : DESC
+        | ASC
+        |
+        ;
+  attributeList :     ID','attributeList
+        | '*'
+        | ID
+        ;
+ tableList    : ID',' tableList
+        | ID
+        ;
+    COND    : COND OR COND
+        | COND AND COND
+        | E
+        | ID IN '(' ST1 ')'
+        ;
+    E    : F'=' F
+        | F '<' F 
+        | F '>' F  
+        | F LE F 
+        | F GE F
+        | F EQ F
+        | F NE F
+        | F OR F 
+        | F AND F 
+        | F LIKE F 
+        ;
+    F    : ID 
+        | NUM  
+        ;
+%%
+#include"lex.yy.c"
+#include<ctype.h>
+main()
+{
+    printf("Enter the query:");
+    yyparse();
+}        
+
+Output:
+
+nn@linuxmint ~ $ lex sq.l
+nn@linuxmint ~ $ yacc sq.y
+nn@linuxmint ~ $ gcc y.tab.c -ll -ly
+nn@linuxmint ~ $ ./a.out
+Enter the query:select model from product where manufacture in ( select manuid from manufactures where manufacture = keltron);
+INPUT ACCEPTED...
+nn@linuxmint ~ $
+You might also like:
+Parser for SQL Query Select - YACC Program - Compiler Design
+Parser for WHILE Statements - YACC Program - Compiler Design
+Parser for IF-THEN Statements - YACC - LEX - Compiler Design
+Parser for IF-THEN-ELSE Statements - YACC Program - Compiler Design
+Linkwithin
+1 comments 
+Labels: Compiler Design, Compiler Lab, Parser, Semester 6, SQL Queries, YACC
+PARSER FOR SWITCH STATEMENTS WITH IF-THEN AND WHILE STATEMENTS INSIDE - COMPILER DESIGN - YACC PROGRAM
+Program:
+
+// Lex file: pars.l
+
+
+alpha [a-zA-Z]
+digit [0-9]
+
+%%
+
+[ \n\t]
+if                  return IF;
+then             return THEN;
+while           return WHILE;
+switch         return SWITCH;
+case             return CASE;
+default         return DEFAULT;
+break           return BREAK;
+{digit}+       return NUM;
+{alpha}({alpha}|{digit})* return ID;
+"<="            return LE;
+">="            return GE;
+"=="            return EQ;
+"!="             return NE;
+"&&"           return AND;
+"||"               return OR;
+.                   return yytext[0];
+
+%%
+
+// Yacc file: pars.y
+
+%{
+#include<stdio.h>
+#include<stdlib.h>
+%}
+
+%token ID NUM SWITCH CASE DEFAULT BREAK LE GE EQ NE AND OR IF THEN WHILE
+%right '='
+%left AND OR
+%left '<' '>' LE GE EQ NE
+%left '+''-'
+%left '*''/'
+%right UMINUS
+%left '!'
+
+%%
+
+S    :    ST{printf("\nInput accepted.\n");exit(0);};
+      ;
+ST  :    SWITCH'('ID')''{'B'}'
+      ;
+B    :    C 
+      |    C D 
+      ;
+C  :    C C
+    |    CASE NUM':'ST1 BREAK';' 
+    ;
+D  :    DEFAULT':'ST1 BREAK';'
+    |    DEFAULT':'ST1
+    ;
+ST1    :    WHILE'('E2')' E';'
+    |    IF'('E2')'THEN E';'
+    |    ST1 ST1
+    |    E';'
+    ;
+E2    :    E'<'E 
+    |    E'>'E
+    |    E LE E
+    |    E GE E
+    |    E EQ E
+    |    E NE E
+    |    E AND E
+    |    E OR E
+    ;
+E    :    ID'='E
+    |    E'+'E 
+    |    E'-'E
+    |    E'*'E 
+    |    E'/'E
+    |    E'<'E
+    |    E'>'E
+    |    E LE E
+    |    E GE E
+    |    E EQ E
+    |    E NE E
+    |    E AND E
+    |    E OR E
+    |    ID 
+    |    NUM
+    ;
+
+%%
+
+#include"lex.yy.c"
+
+main()
+{
+    printf("\nEnter the expression: ");
+    yyparse();
+}
+
+Output:
+
+nn@linuxmint ~ $ lex pars.l
+nn@linuxmint ~ $ yacc pars.y
+conflicts: 5 shift/reduce
+nn@linuxmint ~ $ gcc y.tab.c -ll -ly
+nn@linuxmint ~ $ ./a.out
+
+Enter the expression: switch(s)
+{
+case 1:a=b+c;break;
+case 2:    if(a<10)
+    then a=b*c;
+    break;
+case 3:    while(a<5)
+    b=b+a;
+    break;
+}
+
+Input accepted.
+nn@linuxmint ~ $ 
+
+You might also like:
+Parser for SQL Query Select - YACC Program - Compiler Design
+Addition of n Numbers - Assembly Language - MASM
+Hollow Cubes - TCS Aptitude Questions: Pattern 8
+Student Record using File - C Program
+Linkwithin
+1 comments 
+Labels: Compiler Design, Compiler Lab, IF-THEN-ELSE, Parser, Semester 6, SWITCH, WHILE, YACC
+INTERMEDIATE CODE GENERATOR FOR FOR LOOP - COMPILER DESIGN - YACC PROGRAM
+Program:
+
+// Lex file: im4.l
+
+alpha [A-Za-z]
+digit [0-9]
+
+%%
+
+[\t \n]
+for             return FOR;
+{digit}+    return NUM;
+{alpha}({alpha}|{digit})* return ID;
+"<="         return LE;
+">="         return GE;
+"=="         return EQ;
+"!="          return NE;
+"||"            return OR;
+"&&"         return AND;
+.                return yytext[0];
+
+%%
+
+// Yacc file: im4.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+%token ID NUM FOR LE GE EQ NE OR AND
+%right "="
+%left OR AND
+%left '>' '<' LE GE EQ NE
+%left '+' '-'
+%left '*' '/'
+%right UMINUS
+%left '!'
+
+%%
+
+S       : FOR '(' E ';'{lab1();} E {lab2();}';' E {lab3();}')' E';'{lab4(); exit(0);}
+         ;
+E       : V '='{push();} E{codegen_assign();}
+         | E '+'{push();} E{codegen();}
+         | E '-'{push();} E{codegen();}
+         | E '*'{push();} E{codegen();}
+         | E '/'{push();} E{codegen();}
+         | '(' E ')'
+         | '-'{push();} E{codegen_umin();} %prec UMINUS
+         | V
+         | NUM{push();}
+         ;
+V       : ID {push();}
+         ;
+
+%%
+
+#include "lex.yy.c"
+#include<ctype.h>
+char st[100][10];
+int label[20];
+int top=0;
+char i_[2]="0";
+char temp[2]="t";
+
+int lno=0,ltop=0;
+int start=1;
+
+main()
+{
+    printf("Enter the expression:\n");
+    yyparse();
+}
+
+push()
+{
+   strcpy(st[++top],yytext);
+}
+
+codegen()
+{
+    strcpy(temp,"t");
+    strcat(temp,i_);
+    printf("%s = %s %s %s\n",temp,st[top-2],st[top-1],st[top]);
+    top-=2;
+    strcpy(st[top],temp);
+    i_[0]++;
+}
+
+codegen_umin()
+{
+    strcpy(temp,"t");
+    strcat(temp,i_);
+    printf("%s = -%s\n",temp,st[top]);
+    top--;
+    strcpy(st[top],temp);
+    i_[0]++;
+}
+
+codegen_assign()
+{
+    printf("%s = %s\n",st[top-2],st[top]);
+    top-=2;
+}
+lab1()
+{
+    printf("L%d: \n",lno++);
+}
+lab2()
+{
+    strcpy(temp,"t");
+    strcat(temp,i_);
+    printf("%s = not %s\n",temp,st[top]);
+    printf("if %s goto L%d\n",temp,lno);
+    i_[0]++;
+    label[++ltop]=lno; 
+    lno++;
+    printf("goto L%d\n",lno);
+    label[++ltop]=lno; 
+    printf("L%d: \n",++lno);
+ }
+lab3()
+{
+    int x;
+    x=label[ltop--];
+    printf("goto L%d \n",start);
+    printf("L%d: \n",x);
+    
+}
+
+lab4()
+{
+    int x;
+    x=label[ltop--];
+    printf("goto L%d \n",lno);    
+    printf("L%d: \n",x);
+}
+
+Output:
+nn@linuxmint ~ $ lex im4.l
+nn@linuxmint ~ $ yacc im4.y
+conflicts: 4 shift/reduce
+nn@linuxmint ~ $ gcc y.tab.c -ll -ly
+nn@linuxmint ~ $ ./a.out
+Enter the expression:
+for(i=0;i=b;i=i+1) a=a+b;
+i = 0
+L0: 
+i = b
+t0 = not i
+if t0 goto L1
+goto L2
+L3: 
+t1 = i + 1
+i = t1
+goto L0 
+L2: 
+t2 = a + b
+a = t2
+goto L3 
+L1: 
+nn@linuxmint ~ $ 
+2 comments 
+Labels: Compiler Design, Compiler Lab, For Loop, Intermediate Code Generator, Semester 6, YACC
+POSTFIX TO INFIX - YACC PROGRAM - COMPILER DESIGN
+
+Program:-"Beta version"-(Partial Output Only)
+
+// Lex file: ptoi.l
+
+DIGIT [0-9]
+%%
+{DIGIT}+    {yylval=atoi(yytext);return ID;}
+[-+*/]            {return yytext[0];}
+.                      ;
+\n         yyterminate();
+
+// Yacc file: ptoi.y
+%{
+    #include<stdio.h>
+    #include<string.h>
+    void push();
+    char* top();
+    void a1(char* a);
+%}
+
+%token ID
+
+%%
+
+S    : E  { printf("= %s \n",top());}
+    ;
+E    : E E '+' {a1(" + ");}
+    | E E '*' {a1(" * ");}
+    | E E '-' {a1(" - ");}
+    | E E '/' {a1(" / ");}
+    | ID    {push();}
+    ;
+
+%%
+#include"lex.yy.c"
+
+char st[100][10];
+int indx=0;
+
+void push()
+{
+   strcpy(st[indx++],yytext);
+}
+
+char* pop()
+{
+    return st[--indx];
+}
+
+char* top()
+{
+    return st[indx-1];
+}
+void a1(char* a)
+{
+    char buffer[20];
+    char* c1=pop();
+    char* c2=pop();
+    bzero(buffer,20);
+    strcat(buffer,c2);
+    strcat(buffer,a);
+    strcat(buffer,c1);
+    strcpy(st[indx++],buffer);
+}
+main()
+{
+    yyparse();
+
+}
+
+Output:
+nn@linuxmint ~ $ lex ptoi.l
+nn@linuxmint ~ $ yacc ptoi2.y
+nn@linuxmint ~ $ gcc y.tab.c -ll -ly
+nn@linuxmint ~ $ ./a.out
+2 5 * 3 2 * +
+= 2 * 5 + 3 * 2 
+nn@linuxmint ~ $ ./a.out
+2 5 +
+= 2 + 5 
+nn@linuxmint ~ $ ./a.out
+2 3 *
+= 2 * 3 
+nn@linuxmint ~ $ ./a.out
+2 3 -
+= 2 - 3 
+nn@linuxmint ~ $ ./a.out
+2 5 /
+= 2 / 5 
+nn@linuxmint ~ $ 
+
+1 comments 
+Labels: Arithmetic Expression, Compiler Design, Compiler Lab, Postfix to Infix, Semester 6, YACC
+CONVERT LOWERCASE TO UPPERCASE & REVERSE - LEX PROGAM - COMPILER DESIGN
+CHANGE CASE - LEX - PROGRAM
+
+
+Program:
+
+// Lex file: cap.l
+
+
+lower [a-z]
+CAPS  [A-Z]
+space    [ \t\n]
+
+%%
+{lower}         {printf("%c",yytext[0]- 32);}
+{CAPS}        {printf("%c",yytext[0]+ 32);}
+{space}        ECHO;
+.                    ECHO;
+%%
+
+main()
+{
+    yylex();
+    
+}
+
+Output:
+nn@linuxmint ~ $ lex cap.l
+nn@linuxmint ~ $ gcc lex.yy.c -ll
+nn@linuxmint ~ $ ./a.out<tst.txt
+WWW.2K8618.BLOGSPOT.COM
+sanjana    jamsheena chaithanya neethu
+GOVINDAPRASAD VIPIN ADARSH SHIVIN
+baby brinda kavya helen
+SALMAN TINU RICHARD  SIBIN 
+SHIVIN laji NABEEL
+www.2k8cse.cu.cc
+nn@linuxmint ~ $ 
+
+// tst.txt
+
+www.2k8618.blogspot.com
+SANJANA    JAMSHEENA CHAITHANYA NEETHU
+govindaprasad vipin adarsh shivin
+BABY BRINDA KAVYA HELEN
+salman tinu richard  sibin 
+shivin LAJI nabeel
+WWW.2K8CSE.CU.CC
+19 comments 
+Labels: Changecase, Compiler Design, Compiler Lab, LEX, Semester 6
+COUNT OF WORDS STARTING WITH A - LEX PROGRAM - COMPILER DESIGN
+Program:
+
+// Lex file: aa.l
+
+%{
+        int count=0;
+%}
+alpha    [a-zA-Z]
+digit      [0-9]
+space    [ \t\n]
+start      ^a
+%%
+
+{start}                                           {count++;}
+{space}(a|A)({alpha}|{digit})*    {count++;}
+.                                                      ;
+
+%%
+
+main()
+{
+    yylex();
+    printf("count= %d\n",count);
+}
+Output:
+
+nn@linuxmint ~ $ lex aa.l
+nn@linuxmint ~ $ gcc lex.yy.c -ll
+nn@linuxmint ~ $ ./a.out<tst.txt
+
+count= 6
+nn@linuxmint ~ $ 
+
+
+
+// tst.txt
+
+afsal ARIFA aaa www.2k8618.blogspot.com
+aiswarya saranya    sooraj
+arun reshmi
+a www.2k8cse.cu.cc
+1 comments 
+Labels: Compiler Design, Compiler Lab, Count, LEX, Semester 6
+INTERMEDIATE CODE GENERATOR FOR ARITHMETIC EXPRESSION II (ADVANCED)- YACC PROGRAM - COMPILER LAB
+Program:
+
+// Lex file: imadv.l
+
+ALPHA [A-Za-z]
+DIGIT [0-9]
+
+%%
+
+{ALPHA}({ALPHA}|{DIGIT})*        return ID;
+{DIGIT}+ {yylval=atoi(yytext);       return NUM;}
+[\n\t]                                             yyterminate();
+.                                                   return yytext[0];
+
+%%
+
+
+// Yacc file: imadv.y
+
+%token ID NUM
+%right '='
+%left '+' '-'
+%left '*' '/'
+%left UMINUS
+%%
+
+S    :    ID{push();} '='{push();} E{codegen_assign();}
+      ;
+E    :    E '+'{push();} T{codegen();}
+      |    E '-'{push();} T{codegen();}
+      |    T
+      ;
+T    :    T '*'{push();} F{codegen();}
+      |    T '/'{push();} F{codegen();}
+      |    F
+      ;
+F    :    '(' E ')'
+      |    '-'{push();} F{codegen_umin();} %prec UMINUS
+      |    ID{push();}
+      |    NUM{push();}
+      ;
+
+%%
+
+#include "lex.yy.c"
+#include<ctype.h>
+#include<string.h>
+char st[100][25]; 
+int top=0,ptr=0;
+int tint=0; int tintar[200];
+
+main()
+{
+    printf("Enter the expression : ");
+    yyparse();
+}
+
+push()
+{
+  strcpy(st[++top],yytext);
+  ptr++;
+}
+
+codegen()
+{
+    printf("t%d = %s",tint,st[top-2]);
+    printnum(2);
+    printf(" %s %s",st[top-1],st[top]);
+    printnum(0);
+    printf("\n");
+    top-=2;ptr-=2;
+    strcpy(st[top],"t");
+    tintar[ptr]=tint;
+    tint++;
+}
+
+codegen_umin()
+{
+    printf("t%d = -%s\n",tint,st[top]);
+    printnum(0);
+    top--;ptr--;
+    strcpy(st[top],"t");
+    tintar[ptr]=tint;
+    tint++;
+}
+codegen_assign()
+{
+    printf("%s = ",st[top-2]);
+    printnum(2);
+    printf("%s",st[top]);
+    printnum(0);
+    printf("\n");
+    top-=2;ptr-=2;
+}
+printnum(int n)
+{
+    if( strcmp(st[top-n],"t")==0)
+    {
+         printf("%d",tintar[ptr-n]);
+    }
+}
+
+Output: 
+
+nn@linuxmint ~ $ lex imadv.l
+nn@linuxmint ~ $ yacc imadv.y
+nn@linuxmint ~ $ gcc y.tab.c -ll -ly
+nn@linuxmint ~ $ ./a.out
+Enter the expression : a=b*c+d*c-c/5+2*8-5+5*5/8-8*9/8+8*7
+t0 = b * c
+t1 = d * c
+t2 = t0 + t1
+t3 = c / 5
+t4 = t2 - t3
+t5 = 2 * 8
+t6 = t4 + t5
+t7 = t6 - 5
+t8 = 5 * 5
+t9 = t8 / 8
+t10 = t7 + t9
+t11 = 8 * 9
+t12 = t11 / 8
+t13 = t10 - t12
+t14 = 8 * 7
+t15 = t13 + t14
+a = t15
+nn@linuxmint ~ $
+3 comments 
+Labels: Arithmetic Expression, Compiler Design, Compiler Lab, Intermediate Code Generator, Semester 6, YACC
+PARSER FOR FOR LOOP STATEMENTS - YACC PROGRAM - COMPILER DESIGN
+Program:
+
+// Lex file: for.l
+
+alpha [A-Za-z]
+digit [0-9]
+
+%%
+
+[\t \n] 
+for             return FOR;
+{digit}+    return NUM;
+{alpha}({alpha}|{digit})* return ID;
+"<="         return LE;
+">="         return GE;
+"=="         return EQ;
+"!="          return NE;
+"||"            return OR;
+"&&"         return AND;
+.                return yytext[0];
+
+%%
+
+
+// Yacc file: for.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+%token ID NUM FOR LE GE EQ NE OR AND
+%right "="
+%left OR AND
+%left '>' '<' LE GE EQ NE
+%left '+' '-'
+%left '*' '/'
+%right UMINUS
+%left '!'
+
+%%
+    
+S         : ST {printf("Input accepted\n"); exit(0);}
+ST       : FOR '(' E ';' E2 ';' E ')' DEF
+           ;
+DEF    : '{' BODY '}'
+           | E';' 
+           | ST
+           |
+           ;
+BODY  : BODY BODY
+           | E ';'        
+           | ST
+           |             
+           ;
+        
+E        : ID '=' E 
+          | E '+' E 
+          | E '-' E
+          | E '*' E
+          | E '/' E
+          | E '<' E
+          | E '>' E
+          | E LE E
+          | E GE E
+          | E EQ E
+          | E NE E
+          | E OR E
+          | E AND E
+          | E '+' '+' 
+          | E '-' '-'
+          | ID  
+          | NUM
+          ;
+
+    
+E2     : E'<'E
+         | E'>'E
+         | E LE E
+         | E GE E
+         | E EQ E
+         | E NE E
+         | E OR E
+         | E AND E
+         ;    
+%%
+
+#include "lex.yy.c"
+main() {
+    printf("Enter the expression:\n");
+    yyparse();
+}      
+      
+
+
+Output:
+nn@linuxmint ~ $ lex for.l
+nn@linuxmint ~ $ yacc for.y
+conflicts: 25 shift/reduce, 4 reduce/reduce
+nn@linuxmint ~ $ gcc y.tab.c -ll -ly
+nn@linuxmint ~ $ ./a.out
+Enter the expression:
+for(i=0;i<n;i++)
+i=i+1;
+Input accepted
+nn@linuxmint ~ $
+5 comments 
+Labels: Behrouz A. Forouzan, Compiler Design, Compiler Lab, Parser, Semester 6, YACC
+SELECT LINES ENDING WITH 'COM' - LEX PROGRAM - COMPILER DESIGN
+Program:
+
+// Lex file: com.l
+
+%{
+int count=0;
+%}
+
+%%
+.*com\n {count++;ECHO;}
+. ;
+
+%%
+
+main()
+{
+    yylex();
+    printf("\nCount= %d\n",count);
+    return 0;
+    
+}
+
+Output:
+nn@linuxmint ~ $ lex com.l
+nn@linuxmint ~ $ gcc lex.yy.c -ll
+nn@linuxmint ~ $ ./a.out<com.txt
+
+www.google.com
+www.yahoo.com
+www.2k8618.blogspot.com
+
+
+
+
+Count= 3
+nn@linuxmint ~ $
+
+// com.txt
+
+www.2k8cs.tk
+www.google.com
+www.yahoo.com
+www.2k8618.blogspot.com
+www.2k8cse.cu.cc
+
+0 comments 
+Labels: Compiler Design, Compiler Lab, Count, LEX, Select Lines, Semester 6
+CONVERT DECIMAL NUMBER TO HEXADECIMAL NUMBER IN A FILE - LEX PROGRAM - COMPILER DESIGN
+Program:
+
+
+
+
+// lex file: conv.l
+
+%{
+    #include<stdio.h>
+    int num,r,digit=0,count,pcount=0,i;
+    char a[20];
+%}
+DIGIT [0-9]
+
+%%
+
+{DIGIT}+ {    num=atoi(yytext);
+        while(num!=0)
+        {
+            r=num%16;
+            digit='0'+r;
+            if(digit>'9')
+            digit+=7;
+            a[count++]=digit;
+            num=num/16;
+        }
+        for(i=count-1;i>=pcount;--i)
+                printf("%c",a[i]);
+                pcount=count;
+        }
+.|\n    ECHO;
+        
+%%
+main()
+{
+    yylex();
+    return 0;
+}      
+
+Output:
+nn@linuxmint ~ $ lex conv.l
+nn@linuxmint ~ $ gcc lex.yy.c -lfl
+nn@linuxmint ~ $ ./a.out<c.txt
+DEEPAK A
+F HUNAIF
+NAVITHA 10
+15 RAJINA 
+ABID 18
+1A SANITHA
+nn@linuxmint ~ $
+
+
+// c.txt 
+
+DEEPAK 10
+15 HUNAIF
+NAVITHA 16
+21 RAJINA 
+ABID 24
+26 SANITHA
+1 comments 
+Labels: Baseconversion, Compiler Design, Compiler Lab, Decimal to Hexadecimal, LEX, Semester 6
+POSTFIX EXPRESSION EVALUATION - COMPILER DESIGN - YACC PROGRAM
+Program:
+
+// Lex file: pos.l
+
+DIGIT [0-9]
+%%
+{DIGIT}+    {yylval=atoi(yytext);return ID;}
+[-+*/]        {return yytext[0];}
+. ;
+\n         yyterminate();
+
+// Yacc File: pos.y
+
+%{
+    #include<stdio.h>
+    #include<assert.h>
+    void push(int val);
+%}
+
+%token ID
+
+%%
+
+S     : E  {printf("= %d\n",top());}
+      ;
+E     : E E '+' {push(pop()+pop());}
+     | E E '-' {int temp=pop();push(pop()-temp);}
+     | E E '*' {push(pop()*pop());}
+     | E E '/' {int temp=pop();push(pop()/temp);}
+     | ID    {push(yylval);}
+     ;
+
+%%
+#include"lex.yy.c"
+
+int st[100];
+int i=0;
+
+void push(int val)
+{
+    assert(i<100);
+    st[i++]=val;
+    
+}
+
+int pop()
+{
+    assert(i>0);
+    return st[--i];
+
+}
+
+int top()
+{
+    assert(i>0);
+    return st[i-1];
+}
+int main()
+{
+    yyparse();
+    return 0;
+}
+
+Output:
+
+nn@linuxmint ~ $ lex pos.l
+nn@linuxmint ~ $ yacc pos.y
+nn@linuxmint ~ $ gcc y.tab.c -ll -ly
+nn@linuxmint ~ $ ./a.out
+5 5 -
+= 0
+nn@linuxmint ~ $ 
+4 comments 
+Labels: Compiler Design, Compiler Lab, Infix to Postfix Expression, Semester 6, YACC
+DESK CALCULATOR WITH ERROR RECOVERY - YACC PROGRAM - COMPILER DESIGN
+Program:
+
+// Lex file: desk.l
+
+DIGIT [0-9]+\.?|[0-9]*\.[0-9]+
+
+%%
+
+[ ]
+{DIGIT}    {yylval=atof(yytext);return NUM;}
+\n|.             {return yytext[0];}
+
+// Yacc file: desk.y 
+
+%{
+    #include<ctype.h>
+    #include<stdio.h>
+    #define YYSTYPE double
+%}
+
+%token NUM
+
+%left '+' '-'
+%left '*' '/'
+%right UMINUS
+
+%%
+
+S         : S E '\n' { printf("Answer: %g \nEnter:\n", $2); }
+           | S '\n'
+           |
+           | error '\n' { yyerror("Error: Enter once more...\n" );yyerrok; }
+           ;
+E         : E '+' E    { $$ = $1 + $3; }
+           | E'-'E    { $$=$1-$3; }
+           | E'*'E    { $$=$1*$3; }
+           | E'/'E    { $$=$1/$3; }
+           | '('E')'    { $$=$2; }
+           | '-'E %prec UMINUS { $$= -$2; }
+           | NUM        
+           ;
+
+%%
+
+#include "lex.yy.c"
+
+int main()
+{
+    printf("Enter the expression: ");
+    yyparse();
+}
+
+Output:
+
+nn@linuxmint ~ $ lex desk.l
+nn@linuxmint ~ $ yacc desk.y
+nn@linuxmint ~ $ gcc y.tab.c -ly -lfl
+nn@linuxmint ~ $ ./a.out
+Enter the expression: 1.8+2.8
+Answer: 4.6 
+Enter:
+1.8*10
+Answer: 18 
+Enter:
+20.34/.2
+Answer: 101.7 
+Enter:
+101.7*.2
+Answer: 20.34 
+Enter:
+20.34-18.31
+Answer: 2.03 
+Enter:
+^C
+nn@linuxmint ~ $
+1 comments 
+Labels: Compiler Design, Compiler Lab, Desk Calculator, Semester 6, YACC
+COUNT THE POSITIVE NUMBERS, NEGATIVE NUMBERS & FRACTIONS - LEX PROGRAM - COMPILER DESIGN
+Aim:
+Write a lex program to count the number of Positive numbers, Negative numbers & Fractions.
+
+Program:
+
+// lex file: a.l
+
+%{
+    int postiveno=0;
+    int negtiveno=0;
+    int positivefractions=0;
+    int negativefractions=0;
+%}
+
+DIGIT [0-9]
+%%
+
+\+?{DIGIT}+                              postiveno++;
+-{DIGIT}+                                  negtiveno++;
+
+\+?{DIGIT}*\.{DIGIT}+            positivefractions++;
+-{DIGIT}*\.{DIGIT}+                negativefractions++;
+. ;    
+%%
+
+main()
+{
+    yylex();
+    printf("\nNo. of positive numbers: %d",postiveno);
+    printf("\nNo. of Negative numbers: %d",negtiveno);
+    printf("\nNo. of Positive fractions: %d",positivefractions);
+    printf("\nNo. of Negative fractions: %d\n",negativefractions);
+}
+
+Output:
+
+nn@linuxmint ~ $ lex a.l
+nn@linuxmint ~ $ gcc lex.yy.c -ll
+nn@linuxmint ~ $ ./a.out<a.txt
+
+
+No. of positive numbers: 2
+No. of Negative numbers: 3
+No. of Positive fractions: 4
+No. of Negative fractions: 5
+nn@linuxmint ~ $
+
+// Input file: a.txt 
++12,-123,1.1,-1.1,12,-2,-3,2.1,3.2,5.1,-5.5,-6.1,-7.7,-8.8
+6 comments 
+Labels: Compiler Design, Compiler Lab, Count, LEX, Positive numbers-Negativenumbers-Fractions, Semester 6
+COMPILER DESIGN PREVIOUS QUESTION PAPER SIXTH SEMESTER B.TECH. ENGINEERING DEGREE EXAMINATION, JULY 2011 - KANNUR UNIVERSITY
+VI Semester B. Tech. (Regular/ Supplementary/ Improvement - Including Part Time ) Degree Examination, July 2011 (2007 Admission)
+
+2K6 CS 604 : COMPILER DESIGN
+
+
+
+
+
+1 comments 
+Labels: B-Tech, CD, Compiler Design, Compiler Questions, Kannur University, Previous Question Papers, Semester 6
+PREVIOUS QUESTION PAPERS- COMPILER DESIGN - SIXTH SEMESTER B.TECH. ENGINEERING DEGREE EXAMINATION, APRIL 2009 - KANNUR UNIVERSITY
+
+b
+0 comments 
+Labels: B-Tech, CD, Compiler Design, Compiler Questions, Previous Question Papers, Semester 6
+COMPILER DESIGN - PREVIOUS QUESTION PAPER - SIXTH SEMESTER B.TECH. ENGINEERING DEGREE EXAMINATION, JUNE 2006 - KANNUR UNIVERSITY
+
+
+
+
+1 comments 
+Labels: B-Tech, CD, Compiler Design, Compiler Questions, Kannur University, Previous Question Papers, Semester 6
+COMPILER DESIGN - PREVIOUS QUESTION PAPER - SIXTH SEMESTER B.TECH. ENGINEERING DEGREE EXAMINATION, MAY 2005 - KANNUR UNIVERSITY
+
+
+
+
+1 comments 
+Labels: B-Tech, CD, Compiler Design, Compiler Questions, Kannur University, Previous Question Papers, Semester 6
+PARSER FOR SQL QUERY SELECT - YACC PROGRAM - COMPILER DESIGN
+Program:
+
+// Lex Program :sq.l
+
+
+alpha [A-Za-z]
+digit [0-9]
+%%
+
+
+[ \t\n]
+select            return SELECT;
+distinct         return DISTINCT;
+from             return FROM;
+where           return WHERE;
+like               return LIKE;
+desc              return DESC;
+asc                return ASC;
+"group by"    return GROUP;
+having          return HAVING;
+"order by"    return ORDER;
+or                 return OR;
+and               return AND;
+{digit}+       return NUM;
+{alpha}({alpha}|{digit})* return ID;
+"<="             return LE;
+">="             return GE;
+"=="             return EQ;
+"!="              return NE;
+.                   return yytext[0];
+
+%%
+
+
+// Yacc Program: sq.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+%token ID NUM SELECT DISTINCT FROM WHERE LE GE EQ NE OR AND LIKE GROUP HAVING ORDER ASC DESC
+%right '='
+%left AND OR
+%left '<' '>' LE GE EQ NE
+
+%%
+
+    S         : ST1';' {printf("INPUT ACCEPTED.... \n\t\t...www.2k8cse.cu.cc\n");exit(0);};
+    ST1     : SELECT attributeList FROM tableList ST2
+               | SELECT DISTINCT attributeList FROM tableList ST2
+               ;
+    ST2     : WHERE COND ST3
+               | ST3
+               ;
+    ST3     : GROUP attributeList ST4
+               | ST4
+               ;
+    ST4     : HAVING COND ST5
+               | ST5
+               ;
+    ST5     : ORDER attributeList ST6
+               |
+               ;
+    ST6     : DESC
+               | ASC
+               |
+               ;
+  attributeList :     ID','attributeList
+               | '*'
+               | ID
+               ;
+ tableList    : ID',' tableList
+               | ID
+               ;
+    COND    : COND OR COND
+               | COND AND COND
+               | E
+               ;
+    E         : F '=' F
+               | F '<' F 
+               | F '>' F  
+               | F LE F 
+               | F GE F
+               | F EQ F
+               | F NE F
+               | F OR F 
+               | F AND F 
+               | F LIKE F 
+               ;
+    F         : ID 
+               | NUM  
+               ;
+%%
+#include"lex.yy.c"
+#include<ctype.h>
+main()
+{
+    printf("Enter the query:");
+    yyparse();
+}          
+
+
+Output:
+nn@linuxmint ~ $ lex sq.l
+nn@linuxmint ~ $ yacc sq.y
+nn@linuxmint ~ $ gcc y.tab.c -ll -ly
+nn@linuxmint ~ $ ./a.out
+Enter the query:select name,address from emp where age>20 group by name having age<40 order by name desc;
+INPUT ACCEPTED...
+                                   ...www.2k8cse.cu.cc
+nn@linuxmint ~ $
+4 comments 
+Labels: Compiler Design, Compiler Lab, Parser, Semester 6, SQL Queries, YACC
+COUNT THE VOWELS - LEX PROGRAM
+Program:
+
+// lex file: vw.l
+
+%{
+int count=0;
+%}
+
+%%
+
+[aeiouAEIOU] {count++;ECHO;}
+
+%%
+main()
+{
+    yylex();
+    printf("\nNumber of vowels= %d\n",count);
+    return 0;
+}
+
+Output:
+
+nn@linuxmint ~ $ lex vw.l
+nn@linuxmint ~ $ gcc lex.yy.c -ll
+nn@linuxmint ~ $ ./a.out<vw.txt
+www.2k8618.blogspot.com
+www.2k8cs.tk
+www.google.com
+www.gmail.com
+
+
+Number of vowels= 10
+nn@linuxmint ~ $
+2 comments 
+Labels: Compiler Design, Compiler Lab, Count, LEX, Semester 6, Vowels
+Older Posts Home
+Subscribe to: Posts (Atom)
+Related Posts Plugin for WordPress, Blogger...
+PAGES
+
+C & C++
+Java
+Web Programming
+Assembly Language
+Lisp
+LEX-YACC
+Projects & Seminars
+Placement
+Blog Archive
+Recent
+Tags
+BLOG ARCHIVE
+
+▼  2014 (1)
+▼  October (1)
+Simple Line Chart Using D3 js with Animation, Valu...
+►  2013 (9)
+►  2012 (59)
+►  2011 (179)
+►  2010 (55)
+►  2009 (41)
+►  2008 (2)
+SUBSCRIBE VIA FEEDBURNER
+
+
+
+Enter your email address
+Subscribe
+
+LIKE THIS BLOG?
+
+
+TOTAL PAGEVIEWS
+
+Sparkline 902,668
+ 
+●.. My B.Tech ..● 2K8618.blogspot.com - 2K8CSE
+www.mybtech.tk | www.2k8cse.tk | www.2k8cse.cu.cc | www.2k8cs.tk |. Powered by Blogger.

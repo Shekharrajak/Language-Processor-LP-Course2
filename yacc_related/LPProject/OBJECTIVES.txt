@@ -1,0 +1,12 @@
+>>>OBJECTIVES.txt<<<
+
+The objective of this assignment is to generate Intermediate Code in the form of 3 Address Statements for a Subset-C language. The following
+Operators and Constructs have been taken into consideration:
+1. Data Types: int, unsigned int, boolean.
+2. Assignment Operators: =, +=, -=, *= and /=.
+3. Binary Arithmetic Operators: +, -, *, / and @ (for exponentiation).
+4. Bitwise Operators: | (bitwise OR), & (bitwise AND), ~ (bitwise NOT) and ^ (bitwise XOR).
+5. Binary Logical Operators: && (boolean AND), || (boolean OR) and ! (boolean NOT).
+6. Relational Operators: ==, !=, >, >=, < and <=.
+7. Selection Constructs: 'if-else' and 'switch-case' with 'break'.
+8. Repitition Constructs: 'while' loop.
